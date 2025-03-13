@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Waste Management Form</title>
+    <link rel="stylesheet" type="text/css" href="par.css">
+</head>
+<body>
+    <h1>Waste Management Form</h1>
+    <form id="wasteForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+
+        <label for="address">Address:</label>
+        <textarea id="address" name="address" rows="4" cols="50" required></textarea><br><br>
+
+        <label for="photo">Upload Photo:</label>
+        <input type="file" id="photo" name="photo" accept="image/*" required><br><br>
+
+        <input type="submit" value="Submit">
+        <input type="reset" value="Clear Form">
+    </form>
+    <button onclick="window.location.href='home.html'">Back to Home Page</button>
+</body>
+</html>

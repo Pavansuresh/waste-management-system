@@ -1,0 +1,49 @@
+body{ 
+     
+      background-image: url('loginpage.jpg');
+      /* background-size: cover; Set the background image to cover the entire background */
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 2000px 1400px;
+      }
+.button-container {
+      text-align: center;
+  }
+
+  .button-container button {
+      display: inline-block;
+      margin: 5px;
+  }
+
+  .dropdown {
+      display: inline-block;
+      position: relative;
+  }
+
+  .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 160px;
+      z-index: 1;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  }
+
+  .dropdown-content a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+  }
+
+  .dropdown-content a:hover {
+      background-color: #f1f1f1;
+  }
+
+  .dropdown:hover .dropdown-content {
+      display: block;
+  }
+
+  .dropdown:hover .dropbtn {
+      background-color: #3e8e41;
+  }

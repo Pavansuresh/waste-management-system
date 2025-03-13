@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>first page of my project</title>
+    <style>
+        body {
+            text-align: center;
+            background-image: url('firstpage2.jpg');
+            /* background-size: cover; Set the background image to cover the entire background */
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: 2000px 1200px;
+
+        }
+        h1{
+            color: #09056c;
+        }
+        .button {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            background-color: #af4c4f;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        function redirectToLoginPage() {
+            window.location.href = 'login.html';
+        }
+
+        function redirectToSignInPage() {
+            window.location.href = 'registration.html';
+        }
+    </script>
+</head>
+<body>
+    <h1><u>welcome to waste management system</u></h1>
+    <br><br><br>    <br><br><br>    <br><br><br>
+    <button class="button" onclick="redirectToLoginPage()">Login
+    <button class="button" onclick="redirectToSignInPage()">Sign In
+</body>
+</html>

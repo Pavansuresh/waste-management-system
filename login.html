@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+      <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Your Page Title</title>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+            integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+      <style>
+            body {
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  height: 100vh;
+                  width: 100vw;
+                  margin: 0px;
+                  text-align: center;
+                  background-image: url('loginpage.jpg');
+                  /* background-size: cover; Set the background image to cover the entire background */
+                  background-position: center;
+                  background-repeat: no-repeat;
+                  background-size: 2000px 1200px;
+            }
+      </style>
+
+</head>
+
+<body>
+
+      <div class="mb-5">
+            <h3 class="mb-3">login </h3>
+
+            <input type="text" placeholder="Username" id="userInp" class="form-control mb-3">
+            <input type="password" placeholder="password" id="passInp" class="form-control mb-3">
+            <div class="custom-control custom-switch mb-3">
+                  <input type="checkbox" class="custom-control-input" id="customSwitch1">
+                  <label class="custom-control-label" for="customSwitch1">keep me logged in </label>
+            </div>
+            <button type="text" id="sub_btn" class="=btn w-100 btn-outline-primary mb-3">login </button>
+
+            <a href="registration.html" class="badge badge-secondary py-1 w-100">what to create new account</a>
+
+      </div>
+
+      <script type="module">
+            //-------------------------------FIREbase-------------------------//
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+
+            const firebaseConfig = {
+                  apiKey: "AIzaSyCCxKb0DzgfTCHe2XZqy6ZSP8ey43l_2Zw",
+                  authDomain: "crud-225c1.firebaseapp.com",
+                  databaseURL: "https://crud-225c1-default-rtdb.firebaseio.com",
+                  projectId: "crud-225c1",
+                  storageBucket: "crud-225c1.appspot.com",
+                  messagingSenderId: "624420930479",
+                  appId: "1:624420930479:web:a58a7d85e39e729426a55a"
+            };
+
+            // Initialize Firebase
+            const app = initializeApp(firebaseConfig);
+
+            // import { getDatabase, ref, child, get }
+            // from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+            import { getDatabase, ref, set, child, get, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+
+            const db = getDatabase();
+            // <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/7.14.1/firebase.js">
+
+
+            // -------------------------------------the references-------------------//
+            //The requested module 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js' does not provide an export named 'child' (at login.html:62:39)
+
+            const username = document.getElementById('userInp');
+            const pass = document.getElementById('passInp');
+            const submit = document.getElementById('sub_btn');
+
+
+
+            // ----------------------------AUTHENTICATION PROCESS------------------//
+
+            function AunthenticateUser() {
+                  const dbref = ref(db);
+                  get(child(dbref, "UsersList/" + username.value)).then((snapshot) => {
+                        if (snapshot.exists()) {
+                              // alert()
+                              let dbpass = decPass(snapshot.val().password);
+                              if (dbpass == pass.value) {
+                                    login(snapshot.val());
+                              }
+                              else {
+                                    alert("user does not exist");
+
+                              }
+
+                        }
+
+                        else {
+                              alert("username or password is invalid");
+                        }
+                  });
+
+            }
+
+            //------------------------DECRIPT PROCESS----------------------
+
+            function decPass(dbpass) {
+                  var pass12 = CryptoJS.AES.decrypt(dbpass, pass.value);
+                  return pass12.toString(CryptoJS.enc.Utf8);
+
+            }
+
+            //--------------------------------login--------------------------
+
+            function login(user) {
+
+                  let keepLoggedIn = document.getElementById('customSwitch1').checked;
+
+                  if (!keepLoggedIn) {
+                        sessionStorage.setItem('user', JSON.stringify(user));
+                        if (user.username == "admin") {
+                              window.location = "admin_home.html";
+                        } else if (user.username.includes("worker")) {
+                              window.location = "worker_home.html";
+                        } else {
+
+                              window.location = "home.html";
+                        }
+                  }
+
+                  else {
+                        localStorage.setItem('keepLoggedIn', 'yes');
+                        localStorage.setItem('user', JSON.stringify(user));
+                        window.location = "home.html";
+                  }
+            }
+
+
+            //------------------------------------ASSIGN THE EVENTS--------------------//
+
+            submit.addEventListener('click', AunthenticateUser);
+
+      </script>
+
+
+      <!-- <script src="home.html"></script> -->
+
+</body>
+
+</html>

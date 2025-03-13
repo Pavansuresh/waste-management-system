@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+
+    <style>
+        /* body{ 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            margin: 0px;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: 2000px 1200px;
+        } */
+    </style>
+</head>
+
+<body>
+    <div class="container mt-3">
+        <label for="statusSelect">Select Status:</label>
+        <select id="statusSelect" class="form-control mb-3">
+            <option value="">--All--</option>
+            <option value="Assigned">Assigned</option>
+            <option value="Done">Done</option>
+        </select>
+        <table class="table table-dark">
+            <thead>
+                <th>Complaint ID</th>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Phone Number</th>
+                <th>Address</th>
+                <th>Complaint image</th>
+                <th>Status</th>
+                <th>Action</th> <!-- Add Action column -->
+            </thead>
+            <tbody id="tbody1"></tbody>
+        </table>
+        <button id="homeButton" class="btn btn-primary">Home</button> <!-- Home button -->
+    </div>
+    <script type="module">
+        // ---------------------------------fulling the table-----------------------------//
+        var stdno = 0;
+
+        var tbody = document.getElementById('tbody1');
+
+        function AddItemsToTable(complaintID, date, fullname, phone, address, complaint_image, status, worker) {
+            let trow = document.createElement("tr");
+            let td1 = document.createElement("td");
+            let td2 = document.createElement("td");
+            let td3 = document.createElement("td");
+            let td4 = document.createElement("td");
+            let td5 = document.createElement("td");
+            let td6 = document.createElement("td");
+            let td7 = document.createElement("td");
+            let td9 = document.createElement("td"); // Action column
+            const imgElement = document.createElement("img");
+            imgElement.src = complaint_image;
+            imgElement.alt = "Complaint Image";
+            imgElement.width = 100;
+
+            td1.innerHTML = complaintID;
+            td2.innerHTML = date;
+            td3.innerHTML = fullname;
+            td4.innerHTML = phone;
+            td5.innerHTML = address;
+            td6.appendChild(imgElement);
+            td7.innerHTML = status;
+
+            // Add Done button
+            const doneButton = document.createElement("button");
+            doneButton.textContent = "Done";
+            doneButton.className = "btn btn-success"; // Set button class to success
+            doneButton.addEventListener("click", function (event) {
+                const row = event.target.closest("tr"); // Get the parent row of the Done button
+                const complaintID = row.querySelector("td:first-child").innerHTML; // Get complaint ID from table row
+                const updates = {};
+                updates[`/ComplaintRegistry/${complaintID}/status`] = "Done"; // Update status to "Done" in Firebase
+                update(ref(db), updates)
+                    .then(() => {
+                        alert("Complaint marked as Done!");
+                        ReloadTable(); // Reload the table after marking complaint as Done
+                    })
+                    .catch(error => {
+                        console.error("Error marking complaint as Done:", error);
+                        alert("Error marking complaint as Done. Please try again.");
+                    });
+            });
+            td9.appendChild(doneButton);
+
+            trow.appendChild(td1);
+            trow.appendChild(td2);
+            trow.appendChild(td3);
+            trow.appendChild(td4);
+            trow.appendChild(td5);
+            trow.appendChild(td6);
+            trow.appendChild(td7);
+            trow.appendChild(td9);
+
+            tbody.appendChild(trow);
+        }
+
+        function AddAllItemsToTable(ThePublic) {
+            stdno = 0;
+            tbody.innerHTML = "";
+            ThePublic.forEach(element => {
+                AddItemsToTable(element.complaintID, element.Date, element.fullname, element.phone, element.address, element.imageURL, element.status, element.worker)
+            });
+        }
+
+        //--------------------------fire base connection-----------------------------//
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCCxKb0DzgfTCHe2XZqy6ZSP8ey43l_2Zw",
+            authDomain: "crud-225c1.firebaseapp.com",
+            databaseURL: "https://crud-225c1-default-rtdb.firebaseio.com",
+            projectId: "crud-225c1",
+            storageBucket: "crud-225c1.appspot.com",
+            messagingSenderId: "624420930479",
+            appId: "1:624420930479:web:a58a7d85e39e729426a55a"
+        };
+
+        const currentSessionUser = localStorage["sessionUser"];
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+
+        import { getDatabase, ref, child, onValue, get, update }
+            from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const db = getDatabase();
+
+        //---------------------------Getting all data----------------------
+        function GetAllDataOnce() {
+            const dbref = ref(db);
+            const statusSelect = document.getElementById('statusSelect');
+            const selectedStatus = statusSelect.value;
+
+            get(child(dbref, "ComplaintRegistry"))
+                .then((snapshot) => {
+                    var userComplaints = [];
+                    snapshot.forEach(childSnapshot => {
+                        const eachComplaint = childSnapshot.val();
+                        if ((selectedStatus === '' || eachComplaint.status === selectedStatus) && eachComplaint.worker === currentSessionUser && eachComplaint.status != "unknown") {
+                            userComplaints.push(eachComplaint);
+                        }
+                    });
+
+                    AddAllItemsToTable(userComplaints);
+                });
+        }
+        window.onload = GetAllDataOnce;
+
+        // Event listener for status select change
+        document.getElementById('statusSelect').addEventListener('change', function () {
+            GetAllDataOnce();
+        });
+
+        // Function to reload table
+        function ReloadTable() {
+            GetAllDataOnce();
+        }
+
+        // Event listener for Home button click
+        document.getElementById("homeButton").addEventListener("click", function () {
+            window.location.href = "worker_home.html"; // Navigate to worker_home.html
+        });
+
+    </script>
+</body>
+
+</html>
